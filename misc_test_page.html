@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <style>
+        .BlueBG{
+          display:flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh; width: auto;
+          background-color: rgb(186 230 253)
+        }
+        .app{
+          width: 42rem; height: auto;
+          border-radius: 1rem;
+          background-color: white;
+        }
+        .centerdiv{
+          display: flex; 
+          justify-content: center;
+        }
+      </style>
+</head>
+<body>
+    <div class="BlueBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Misc Debug</h1>
+          </div>
+
+          <div class="centerdiv">
+            Gold: <input type="number" id="myGold_display" value="0" min="0"> <input type="button" value="set" onclick="setGold()">
+          </div>
+
+          <div class="centerdiv">
+            Spelltome Pages: <input type="number" id="myPages_display" value="1" min="1"> <input type="button" value="set" onclick="setPages()">
+          </div>
+
+          <div class="centerdiv">
+            Max HP: <input type="number" id="myMaxHP_display" value="100" min="1"> <input type="button" value="set" onclick="setMaxHP()">
+          </div>
+
+          <div class="centerdiv">
+            Name: <input type="text" id="myName_display" value="???"> <input type="button" value="set" onclick="setName()">
+          </div>
+
+          <div class="centerdiv">
+            <input type="button" value="set initalized true" onclick="setInitializedTrue()">
+            <input type="button" value="set initalized false" onclick="setInitializedFalse()">
+          </div>
+        </div>
+    </div>
+      <script>
+
+        function start()
+        {
+          load_gold();
+          load_pages();
+          load_maxhp();
+          load_Name();
+        }
+
+        function load_gold()
+        {
+          if (localStorage.getItem("myGold") == null) return;
+          var myGold = localStorage.getItem("myGold");
+          var myGold_display = document.getElementById("myGold_display");
+          myGold_display.value = myGold;
+        }
+
+        function load_pages()
+        {
+          if (localStorage.getItem("myPages") == null) return;
+          var myPages = localStorage.getItem("myPages");
+          var myPages_display = document.getElementById("myPages_display");
+          myPages_display.value = myPages;
+        }
+
+        function load_maxhp()
+        {
+          if (localStorage.getItem("myMaxHP") == null) return;
+          var myMaxHP = localStorage.getItem("myMaxHP");
+          var myMaxHP_display = document.getElementById("myMaxHP_display");
+          myMaxHP_display.value = myMaxHP;
+        }
+
+        function load_Name()
+        {
+          if (localStorage.getItem("myName") == null) return;
+          var myName = localStorage.getItem("myName");
+          var myName_display = document.getElementById("myName_display");
+          myName_display.value = myName;
+        }
+
+        function setGold() 
+        {
+          const myGold_display = document.getElementById("myGold_display");
+          var myGold = myGold_display.value;
+          localStorage.setItem("myGold", myGold);
+        }
+
+        function setPages() 
+        {
+          const myPages_display = document.getElementById("myPages_display");
+          var myPages = myPages_display.value;
+          localStorage.setItem("myPages", myPages);
+        }
+
+        function setMaxHP() 
+        {
+          const myMaxHP_display = document.getElementById("myMaxHP_display");
+          var myMaxHP = myMaxHP_display.value;
+          localStorage.setItem("myMaxHP", myMaxHP);
+        }
+
+        function setName() 
+        {
+          const myName_display = document.getElementById("myName_display");
+          var myName = myName_display.value;
+          localStorage.setItem("myName", myName);
+        }
+
+        function setInitializedTrue(){
+          localStorage.setItem("isInitialized", "true");
+        }
+
+        function setInitializedFalse(){
+          localStorage.clear();
+        }
+        window.addEventListener("load", start, false);  
+      </script>
+</body>
+</html>

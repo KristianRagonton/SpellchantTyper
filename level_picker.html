@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div class="teleBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Crossroads of Adventure</h1>
+          </div>
+
+          <div class="centerdiv" style="padding-bottom: 0px;">
+            <p>Type <span class="typeB">Return</span> to go back to town</p>
+          </div>
+          <div class="centerdiv" style="padding-bottom: 10px; border-bottom: 2px solid #492f48;">
+            <p><span class="typeB">Go to Practice</span> - Enemies: Target Dummy</p>
+          </div>
+
+          <div style="padding-bottom: 1rem; text-align: center;">
+            <h3>Forest of Beginnings</h3>
+            <p><span class="typeB">Go to Outer Forest</span> - Enemies: Green Slime, Angry Rabbit, Giant Caterpillar</p>
+            <p id="InnerForest_txt"><span class="typeB">Inner Forest</span> is unlocked by beating "Outer Forest"</p>
+            <p id="ForestBoss_txt"><span class="typeB">Den of the Forest King</span> is unlocked by beating "Inner Forest"</p>
+          </div>
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <input type="text" name="Textbox" id="Textbox" autofocus>
+            <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+          </div>
+
+        </div>
+    </div>
+
+      <script>
+        var input = document.getElementById("Textbox");
+        var completed_Levels = {outer_forest: "false", inner_forest: "false"};
+
+        function start()
+        {
+          load_CompletedLevels();
+        }
+
+        input.addEventListener("keypress", function(event)
+        {
+          if (event.key === "Enter")
+          {
+            event.preventDefault();
+            document.getElementById("Enter_btn").click();
+          }
+        });
+
+        function enter_Chant()
+        {
+          var text_Box = document.getElementById("Textbox");
+          var chant_input = text_Box.value;
+
+          if(chant_input=="Return")
+          {
+            location.replace("main_hub.html");
+          }
+          else if(chant_input=="Go to Practice")
+          {
+            location.replace("combat_encounter.html");
+          }
+          else if(chant_input=="Go to Outer Forest")
+          {
+            set_Forest_Outer();
+            location.replace("combat_encounter.html");
+          }
+          else if(chant_input=="Go to Inner Forest")
+          {
+            if(completed_Levels.outer_forest == "true"){
+              set_Forest_Inner();
+              location.replace("combat_encounter.html");
+            }
+            else{
+              alert("Complete the previous level first!");
+            }
+          }
+          else if(chant_input=="Go to Den of the Forest King")
+          {
+            if(completed_Levels.inner_forest == "true"){
+              set_Forest_Boss();
+              location.replace("combat_encounter.html");
+            }
+            else{
+              alert("Complete the previous level first!");
+            }
+          }
+          else
+          {
+            alert("Invalid Input!");
+          }
+          text_Box.value = ""
+        }
+
+        function load_CompletedLevels(){
+          if (localStorage.getItem("level_outerforest_completed") == "true") {
+            completed_Levels.outer_forest = "true";
+            document.getElementById("InnerForest_txt").innerHTML = "<span class=\"typeB\">Go to  Inner Forest</span> - Enemies: Goblin Scout, Forest Boar, Giant Moth";
+          }
+          if (localStorage.getItem("level_innerforest_completed") == "true") {
+            completed_Levels.inner_forest = "true";
+            document.getElementById("ForestBoss_txt").innerHTML = "<span class=\"typeB\">Go to Den of the Forest King</span> - Boss Enemy: King Green Slime";
+          }
+        }
+
+        function set_Forest_Outer(){
+          selected_enemy = Math.floor(1+Math.random()*3)
+          var selected_Enemy_Info
+          var selected_Enemy_Behavior_data
+          if (selected_enemy == 1){
+            selected_Enemy_Info = {enemy_name: "Green Slime", enemy_max_health: 25,
+            fire_res: -0.5, water_res: 1.5, frost_res: 0, earth_res: 0.2, lightning_res: 0, wind_res: 0, nature_res: 0.15, holy_res: 0, dark_res: 0,
+            enemy_reward_gold: 5, enemy_timing: 15, enemy_behavior: "basic"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 5, attack_desc: "tackles you with its entire body"};
+
+          }else if(selected_enemy == 2){
+            selected_Enemy_Info = {enemy_name: "Angry Rabbit", enemy_max_health: 25,
+            fire_res: -0.2, water_res: 0.1, frost_res: 0.2, earth_res: 0, lightning_res: 0, wind_res: 0, nature_res: 0, holy_res: 0, dark_res: 0,
+            enemy_reward_gold: 10, enemy_timing: 15, enemy_behavior: "basic"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 10, attack_desc: "lunges and bites you with its front teeth"};
+
+          }else if(selected_enemy == 3){
+            selected_Enemy_Info = {enemy_name: "Giant Caterpillar", enemy_max_health: 20,
+            fire_res: -0.85, water_res: 0.3, frost_res: 0, earth_res: -0.2, lightning_res: 0, wind_res: 0, nature_res: 0.3, holy_res: 0, dark_res: 0,
+            enemy_reward_gold: 10, enemy_timing: 15, enemy_behavior: "basic"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 10, attack_desc: "shoots spikes all around it"};
+
+          }
+          localStorage.setItem("selected_Enemy_Info", JSON.stringify(selected_Enemy_Info));
+          localStorage.setItem("selected_Enemy_Behavior_data", JSON.stringify(selected_Enemy_Behavior_data));
+          localStorage.setItem("selected_Level", "Forest of Beginnings: Outer Forest");
+        }
+
+        function set_Forest_Inner(){
+          var selected_enemy = Math.floor(1+Math.random()*3)
+          var selected_Enemy_Info
+          var selected_Enemy_Behavior_data
+          if (selected_enemy == 1){
+            selected_Enemy_Info = {enemy_name: "Goblin Scout", enemy_max_health: 40,
+            fire_res: 0, water_res: 0.1, frost_res: 0.1, earth_res: 0.1, lightning_res: 0.1, wind_res: 0.2, nature_res: 0.1, holy_res: 0, dark_res: 0,
+            enemy_reward_gold: 50, enemy_timing: 15, enemy_behavior: "escaper"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 5, attack_desc: "stabs you with its dagger", escape_ready: false, escape_hp: 15};
+
+          }else if(selected_enemy == 2){
+            selected_Enemy_Info = {enemy_name: "Forest Boar", enemy_max_health: 50,
+            fire_res: -0.1, water_res: 0.1, frost_res: 0.3, earth_res: 0.1, lightning_res: 0.1, wind_res: 0.3, nature_res: 0.2, holy_res: 0, dark_res: 0,
+            enemy_reward_gold: 25, enemy_timing: 20, enemy_behavior: "basic"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 25, attack_desc: "charges at you wildly"};
+
+          }else if(selected_enemy == 3){
+            selected_Enemy_Info = {enemy_name: "Giant Moth", enemy_max_health: 35,
+            fire_res: -0.5, water_res: 0.25, frost_res: 0.1, earth_res: 0.3, lightning_res: 0.1, wind_res: 0.5, nature_res: 0.3, holy_res: 0, dark_res: 0.1,
+            enemy_reward_gold: 25, enemy_timing: 12, enemy_behavior: "basic"};
+
+            selected_Enemy_Behavior_data = {attack_damage: 20, attack_desc: "flaps in your direction, releasing razor sharp scales"};
+
+          }
+          localStorage.setItem("selected_Enemy_Info", JSON.stringify(selected_Enemy_Info));
+          localStorage.setItem("selected_Enemy_Behavior_data", JSON.stringify(selected_Enemy_Behavior_data));
+          localStorage.setItem("selected_Level", "Forest of Beginnings: Inner Forest");
+        }
+
+        function set_Forest_Boss(){
+          var selected_Enemy_Info
+          var selected_Enemy_Behavior_data
+
+          selected_Enemy_Info = {enemy_name: "King Green Slime", enemy_max_health: 100,
+          fire_res: -0.65, water_res: 2, frost_res: 0.3, earth_res: 0.3, lightning_res: 0.3, wind_res: 0.45, nature_res: 0.8, holy_res: 0, dark_res: 0,
+          enemy_reward_gold: 1000, enemy_timing: 20, enemy_behavior: "forest_boss"};
+
+          selected_Enemy_Behavior_data = {attack_damage: 50, attack_desc: "slams you with great force", slimed_duration: 10, self_heal: 20};
+
+          localStorage.setItem("selected_Enemy_Info", JSON.stringify(selected_Enemy_Info));
+          localStorage.setItem("selected_Enemy_Behavior_data", JSON.stringify(selected_Enemy_Behavior_data));
+          localStorage.setItem("selected_Level", "Forest of Beginnings: Den of the Forest King");
+        }
+
+        window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>

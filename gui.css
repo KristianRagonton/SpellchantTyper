@@ -1,0 +1,427 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.introBG{
+  background: url(imgs/intro.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.hubBG{
+  background: url(imgs/town.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.profileBG{
+  background: url(imgs/home.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.teleBG{
+  background: url(imgs/tele.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.trainBG{
+  background: url(imgs/training.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.forestBG{
+  background: url(imgs/forest.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.shopBG{
+  background: url(imgs/shop.jpg);
+  background-size: cover;
+  background-position: center center;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; width: auto;
+}
+
+.app{
+  width: 42rem;
+  height: auto;
+  border-radius: 1rem;
+  background-color: black;
+  opacity: 0.7;
+  color: white;
+  padding: 0px 0px 20px;
+  box-shadow: 0 0px 20px rgb(255 255 255 / 90%);
+  border: 2px solid #d2ad4f;
+}
+.centerdiv{
+  display: flex;
+  justify-content: center;
+}
+.app input#Textbox {
+    font-size: large;
+    text-align: center;
+}
+
+.typeB{
+    background: #ffbd46;
+    padding: 5px 15px;
+    border-radius: 20px 0px;
+    color: #000000;
+    box-shadow: inset 0 0px 15px rgb(0 0 0 / 80%);
+    font-weight: bold;
+}
+
+.typeSlime{
+  background: #8b8b8b;
+  padding: 5px 15px;
+  border-radius: 20px 0px;
+  color: #ffffff;
+  box-shadow: inset 0 0px 15px rgb(0 0 0 / 80%);
+  font-weight: bold;
+}
+
+input#Enter_btn {
+	padding: 5px 15px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bolder;
+    font-size: large;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 0px 15px rgb(0 0 0 / 60%);
+    border: none;
+    background: #a47319;
+    border-bottom: 5px solid #604008;
+}
+
+h1{
+	border-radius: 15px;
+    border-bottom: 1px solid #d2ad4f;
+    padding: 10px 50px;
+}
+
+.bluebar{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: solid 1px #adc1eb;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background: linear-gradient(white 1%, rgb(173, 193, 235) 20%, white 110%);
+    width: 100%;
+    border-bottom: 2px solid #d2ad4f;
+}
+
+.hubBG .app{
+  background-color: #f8d29f;
+  box-shadow: 0 0px 20px rgb(0 0 0 / 90%);
+  border: 2px solid #493630;
+  color: #40312e;
+}
+
+.introBG .app{
+  background-color: #17455d;
+}
+
+.profileBG .app {
+  background-color: #3e3331;
+  color: white;
+  box-shadow: 0 0px 20px rgb(0 0 0 / 90%);
+  border: 2px solid #262020;
+}
+
+.profileBG h1{
+    border-bottom: 2px solid white;
+    margin-bottom: 0px;
+    margin-top: 10px;
+}
+
+.prtype{
+  padding-top: 0px;
+  padding-bottom: 15px;
+  text-align: center;
+  border-bottom: 2px solid #492f48;
+  margin-bottom: 0px;
+}
+
+.prmid{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: #341503;
+  margin-bottom: 20px;
+}
+
+.bar {
+    background: #228B22;
+    width: 100%;
+    height: 10px;
+    position: relative;
+    transition: width .5s linear;
+}
+
+.health-bar {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 200px;
+    height: 20px;
+    padding: 5px;
+    background: #ddd;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.spellsBox{
+  list-style-type: none; width: auto; height: auto; max-height:200px; overflow: auto;
+}
+
+.profileBG .health-bar{
+  padding: 3px;margin-left: 5px;height: 23px;width: auto;border-radius: 10px;
+}
+
+.profileBG .bar{
+  height: 17px;
+  border-radius: 50px;
+}
+
+.teleBG .app {
+  background-color: #4e9df4;
+  color: #02122c;
+  box-shadow: 0 0px 20px rgb(0 0 0 / 90%);
+  border: 2px solid #030e2c;
+}
+
+.teleBG h1{
+  border-bottom: 2px solid white;
+}
+
+#CombatLog_ul{
+  list-style-type: disc;
+  width: 500px;
+  height: auto;
+  max-height: 200px;
+  overflow: auto;
+}
+
+#combatNode .hit {
+  background: rgba(255,55,55,0.6);
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 0px;
+  transition: width .5s linear;
+}
+
+.cmmid{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: #143a40;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0px 8px rgb(255 255 255 / 60%);
+}
+
+#combatNode .app{
+  width:1000px;
+  padding-bottom: 0px;
+}
+
+.leftBox {
+    width: 650px;
+    padding: 5px 0px 20px 0px;
+}
+
+.rightBox {
+  width: 350px;
+  background: white;
+  border-radius: 0px 15px 0px 0px;
+  color: black;
+  padding: 30px 0px 20px 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+#combatNode #CombatLog_ul {
+    width: 100%;
+    max-height:260px;
+}
+
+.antagonist{
+  padding-bottom: 1rem;
+}
+
+.cmTxts{
+  padding-top: 20px;
+  padding-bottom: 1rem;
+  text-align: center;
+  border-top: 2px solid #d2ad4f;
+  height: 80px;
+}
+
+.combatTB {
+  box-shadow: inset 0 0px 20px rgb(255 255 255 / 90%);
+  padding: 0px 0px 20px;
+  background: black;
+  border-radius: 0px 0px 15px 15px;
+  border: 2px solid white;
+}
+
+.cmTimer{
+  width: 298px;
+  background: white;
+  color: black;
+  padding: 2px 0px;
+  border-radius: 0px 0px 30px 30px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+#spelltome_ul input {
+    background: none;
+    border: 1px solid #7e5a0e;
+    color: #ffd375;
+    text-align: center;
+}
+
+#learned_spells_ul input {
+  background: none;
+  border: 1px solid #1613c2;
+  color: #a3a3a3;
+  text-align: center;
+}
+
+#Shop_ul input {
+  background: none;
+  border: 1px solid #7e5a0e;
+  color: #ffd375;
+  text-align: center;
+}
+
+#Shop_guide_ul input {
+  background: none;
+  border: 1px solid #7e5a0e;
+  color: #ffd375;
+  text-align: center;
+}
+
+.enemyStats, .wizStats{
+    width: 250px;
+}
+
+#enemyImg, .wizImg{
+    width: 150px;
+}
+
+.wizImg{
+  background: url(imgs/wiz.gif);
+  background-size: auto;
+  background-position: center center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#enemyImg{
+  background-size: auto !important;
+  background-position: center center !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-repeat: no-repeat !important;
+}
+
+.trainBG #enemyImg{
+  background: url(imgs/dummy.gif);
+}
+
+#combatNode .app{
+  opacity:0.75;
+}
+
+#enemyImg.caterpillar{
+  background: url(imgs/caterpillar.gif);
+}
+
+#enemyImg.moth{
+  background: url(imgs/moth.gif);
+}
+
+#enemyImg.slime{
+  background: url(imgs/greenslime.gif);
+}
+
+#enemyImg.rabbit{
+  background: url(imgs/rabbit.gif);
+}
+
+#enemyImg.goblin{
+  background: url(imgs/goblin.gif);
+}
+
+#enemyImg.boar{
+  background: url(imgs/boar.gif);
+}
+
+#enemyImg.slimeboss{
+  background: url(imgs/slimeboss.gif);
+  background-size: 70% auto !important;
+}
+
+#spelltome_ul li {
+    padding-bottom: 15px;
+}
+
+#learned_spells_ul li {
+  padding-bottom: 5px;
+}
+
+#Shop_ul li {
+  padding-bottom: 5px;
+}
+
+.shopBG .app {
+    background-color: #3a0d02;
+    box-shadow: 0 0px 20px rgb(249 250 245);
+    border: 2px solid #fab555;
+    color: white;
+}
+
+.shmid{
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: #4a533c;
+  margin-bottom: 20px;
+}

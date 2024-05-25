@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+	<link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div class="hubBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Geffen, the City of Magic</h1>
+          </div>
+
+          <div style="padding-top: 1rem; padding-bottom: 1rem; text-align: center;">
+            <p>Type <span class="typeB">Profile</span> to go home and check your spells</p>
+            <p>Type <span class="typeB">Shop</span> to go to the shop</p>
+            <p>Type <span class="typeB">Embark</span> to go on an adventure</p>
+          </div>
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <input type="text" name="Textbox" id="Textbox" autofocus>
+            <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+          </div>
+
+        </div>
+    </div>
+    <script>
+      var input = document.getElementById("Textbox");
+
+      input.addEventListener("keypress", function(event)
+      {
+        if (event.key === "Enter")
+        {
+          event.preventDefault();
+          document.getElementById("Enter_btn").click();
+        }
+      });
+
+      function enter_Chant()
+      {
+        var text_Box = document.getElementById("Textbox");
+        var chant_input = text_Box.value;
+
+        if(chant_input=="Profile")
+        {
+          location.replace("profile.html");
+        }
+        else if(chant_input=="Shop")
+        {
+          location.replace("shop.html");
+        }
+        else if(chant_input=="Embark")
+        {
+          location.replace("level_picker.html");
+        }
+        else
+        {
+          alert("Invalid Input!");
+          text_Box.value = ""
+        }
+      }
+    </script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div id="combatNode">
+        <div class="app">
+          <div style="display: flex;">
+            <div class="leftBox">
+              <div class="centerdiv">
+                <h1 id="SelectedLevel_display">Training Grounds</h1>
+              </div>
+
+              <div class="antagonist">
+                <div class="centerdiv">
+                  <div class="enemyStats">
+                    <h3 id="Enemy_Name_Display" style="text-align: center;">Enemy Name Here</h3>
+                      <div class="centerdiv">
+                      <strong>HP:</strong>&nbsp<label id="Enemy_CurrentHP_Display">?</label>/<label id="Enemy_MaxHP_Display">?</label>&nbsp<label id="Enemy_PercentHP_Display">??%</label>
+                      </div>
+                      <div class="centerdiv">
+                        <div id="Enemy_HP_bar" class="health-bar">
+                          <div id="Enemy_bar" class="bar">
+                              <div id="Enemy_hit" class="hit"></div>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div id="enemyImg">
+                  </div>
+                </div>
+
+                  <div class="centerdiv">
+                    <ul style="list-style-type: none;">
+                      <li><strong>Fire Resistance:</strong>&nbsp<label id="Fire_Res_Display">?%</label></li>
+                      <li><strong>Water Resistance:</strong>&nbsp<label id="Water_Res_Display">?%</label></li>
+                      <li><strong>Frost Resistance:</strong>&nbsp<label id="Frost_Res_Display">?%</label></li>
+                      <li><strong>Earth Resistance:</strong>&nbsp<label id="Earth_Res_Display">?%</label></li>
+                      <li><strong>Lightning Resistance:</strong>&nbsp<label id="Lightning_Res_Display">?%</label></li>
+                    </ul>
+                    <ul style="list-style-type: none;">
+                      <li><strong>Wind Resistance:</strong>&nbsp<label id="Wind_Res_Display">?%</label></li>
+                      <li><strong>Nature Resistance:</strong>&nbsp<label id="Nature_Res_Display">?%</label></li>
+                      <li><strong>Holy Resistance:</strong>&nbsp<label id="Holy_Res_Display">?%</label></li>
+                      <li><strong>Dark Resistance:</strong>&nbsp<label id="Dark_Res_Display">?%</label></li>
+                    </ul>
+                  </div>
+              </div>
+
+              <div class="protagonist">
+                <div class="centerdiv">
+                  <div class="wizImg"></div>
+                  <div class="wizStats">
+                    <div style="text-align: center;">
+                      <h3 id="Player_Name_Display">Player Name Here</h3>
+                      <strong>Your HP:</strong>&nbsp<label id="Player_CurrentHP_Display">?</label>/<label id="Player_MaxHP_Display">?</label>&nbsp<label id="Player_PercentHP_Display">??%</label>
+                    </div>
+                    <div class="centerdiv">
+                      <div id="Player_HP_bar" class="health-bar">
+                        <div id="Player_bar" class="bar">
+                            <div id="Player_hit" class="hit"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="centerdiv" style="margin-top: 10px;">
+                  <p class="centerdiv" style="margin-bottom: 0px;">Spells in Tome:</p>
+                  <div class="centerdiv">
+                    <ul id="spelltome_ul" style="list-style-type: none;"></ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="rightBox">
+              <div style="flex:1;">
+                <div class="centerdiv">
+                  <h4>Combat Log:</h4>
+                </div>
+                <div class="centerdiv">
+                  <ul id="CombatLog_ul"></ul>
+                </div>
+              </div>
+
+              <div class="cmTxts">
+                <p id="Combat_Guide_txt">Type <span class="typeB">Begin Combat</span> to start the battle</p>
+                <p id="Initial_Return_txt">Type <span class="typeB">Return</span> to go back to town</p>
+              </div>
+
+          </div>
+          </div>
+          <div class="combatTB">
+            <div class="centerdiv">
+              <div class="cmTimer">
+                <strong>Attack Timer:</strong>&nbsp<label id="Attack_Timer_Display">?</label>
+              </div>
+            </div>
+            <div class="centerdiv">
+              <input type="text" name="Textbox" id="Textbox" autofocus>
+              <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+            </div>
+          </div>
+        </div>
+    </div>
+      <script>
+        var input = document.getElementById("Textbox");
+        var combat_state=false;
+        var combat_initiated=false;
+        var spellName_array = new Array();
+        var spellChant_array = new Array();
+        var wordType_array = new Array();
+        var wordNum_array = new Array();
+        var timer = 15;
+        var timerTock;
+
+        var player_current_health;
+        var player_max_health;
+        var selected_Level;
+        var retreat_blocked = false;
+
+        var enemy_name = "Target Dummy";
+        var enemy_current_health = 250;
+        var enemy_max_health = 250;
+        var enemy_resistances = {fire_res: 0.1, water_res: 0.1, frost_res: 0.1, earth_res: 0.1, lightning_res: 0.1, wind_res: 0.1, nature_res: 0.1, holy_res: 0.1, dark_res: 0.1};
+        var enemy_reward_gold = 0;
+        var enemy_timing = 15;
+        var enemy_behavior = "basic";
+        var enemy_behavior_data = {attack_damage: 1, attack_desc: "did nothing but you do feel a little tired"};
+
+        input.addEventListener("keypress", function(event)
+        {
+          if (event.key === "Enter")
+          {
+            event.preventDefault();
+            document.getElementById("Enter_btn").click();
+          }
+        });
+
+        function start()
+        {
+          load_Player_MaxHP();
+          update_Player_HP_Display();
+          load_Spelltome();
+          load_Selected_Enemy();
+          update_Enemy_Display();
+          load_combat_node();
+        }
+
+        function enter_Chant()
+        {
+          var text_Box = document.getElementById("Textbox");
+          var chant_input = text_Box.value;
+
+          if(chant_input=="Return" && combat_state==false)
+          {
+            location.replace("main_hub.html");
+          }
+          else if(chant_input=="Return" && combat_state==true)
+          {
+            addToLog("You are in combat! Use \"Retreat\" instead!");
+          }
+          else if(chant_input=="Retreat" && combat_state==true && retreat_blocked==true)
+          {
+            addToLog("You failed to retreat");
+          }
+          else if(chant_input=="Retreat" && combat_state==true && retreat_blocked==false)
+          {
+            location.replace("main_hub.html");
+          }
+          else if(chant_input=="Retreat" && combat_state==false)
+          {
+            addToLog("Use \"Return\" instead!");
+          }
+          else if(chant_input=="Begin Combat" && combat_initiated == false)
+          {
+            combat_initiated = true;
+            combat_state = true;
+            addToLog("Combat Begun");
+            start_Attack_Timer(enemy_timing);
+            if(retreat_blocked==false){
+            document.getElementById("Combat_Guide_txt").innerHTML="Type <span class=\"typeB\">Retreat</span> to escape battle.";
+            document.getElementById("Initial_Return_txt").innerHTML="";
+            }
+            else if(selected_Level == "Forest of Beginnings: Den of the Forest King"){
+            document.getElementById("Combat_Guide_txt").innerHTML="A mass of smaller slimes blocks the way out";
+            document.getElementById("Initial_Return_txt").innerHTML="You cannot <span class=\"typeSlime\">Retreat</span>";
+            }
+          }
+          else
+          {
+            cast_Spell(chant_input);
+          }
+          text_Box.value = ""
+        }
+
+        function addToLog(log_msg)
+        {
+          const list = document.getElementById("CombatLog_ul");
+
+          const li = document.createElement("li");
+          li.innerHTML = log_msg;
+          list.insertBefore(li, list.children[0]);
+          log_msg = "";
+        }
+
+        function load_Spelltome()
+        {
+          if (localStorage.getItem("spells") == null) return;
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          if(spellname.inSpelltome == "true"){
+            spellName_array.push(spellname.spellname);
+            wordType_array.push(spellname.wordtype);
+            wordNum_array.push(spellname.wordnum);
+            var temp_chant = randomize_Chant(spellname.wordtype,spellname.wordnum);
+            for (i=0; i< spellChant_array.length;){
+              if(spellChant_array[i]==temp_chant){
+                temp_chant = randomize_Chant(spellname.wordtype,spellname.wordnum);
+              }
+              else{
+                i++;
+              }
+            }
+            spellChant_array.push(temp_chant);
+          }
+          });
+
+          update_Spelltome_ul();
+        }
+
+        function update_Spelltome_ul()
+        {
+          document.getElementById("spelltome_ul").innerHTML = ""
+          for (i=0; i< spellName_array.length; i++){
+            const list = document.getElementById("spelltome_ul");
+            const li = document.createElement("li");
+
+            li.innerHTML = `<input type="text" value="${spellName_array[i]}" readonly>
+            <label style="margin-right: 20px;"><span class="typeB">${spellChant_array[i]}</span></label>`;
+            list.insertBefore(li, list.children[0]);
+          }
+        }
+
+        function load_Player_MaxHP()
+        {
+          if (localStorage.getItem("myMaxHP") == null) return;
+          if (localStorage.getItem("myName") == null) return;
+          var myName = localStorage.getItem("myName");
+          var myName_display = document.getElementById("Player_Name_Display");
+          var myMaxHP = localStorage.getItem("myMaxHP");
+          player_max_health = parseInt(myMaxHP);
+          player_current_health = parseInt(myMaxHP);
+          myName_display.innerHTML = myName;
+        }
+
+        function update_Player_HP_Display(){
+          document.getElementById("Player_CurrentHP_Display").innerHTML = player_current_health;
+          document.getElementById("Player_MaxHP_Display").innerHTML = player_max_health;
+          if (enemy_current_health == 0){
+            document.getElementById("Player_PercentHP_Display").innerHTML = "(Defeated)";
+          }else{
+            document.getElementById("Player_PercentHP_Display").innerHTML = "("+((player_current_health/player_max_health)*100).toFixed(2)+"%)";
+          }
+        }
+
+        function load_Selected_Enemy(){
+          if (localStorage.getItem("selected_Enemy_Info") == null) return;
+          if (localStorage.getItem("selected_Enemy_Behavior_data") == null) return;
+          if (localStorage.getItem("selected_Level") == null) return;
+          var selected_Enemy_Info = JSON.parse(localStorage.getItem("selected_Enemy_Info"));
+          var selected_Enemy_Behavior_data = JSON.parse(localStorage.getItem("selected_Enemy_Behavior_data"));
+          enemy_name = selected_Enemy_Info.enemy_name;
+          enemy_max_health = selected_Enemy_Info.enemy_max_health;
+          enemy_current_health = enemy_max_health;
+          enemy_resistances.fire_res = parseFloat(selected_Enemy_Info.fire_res);
+          enemy_resistances.water_res = parseFloat(selected_Enemy_Info.water_res);
+          enemy_resistances.frost_res = parseFloat(selected_Enemy_Info.frost_res);
+          enemy_resistances.earth_res = parseFloat(selected_Enemy_Info.earth_res);
+          enemy_resistances.lightning_res = parseFloat(selected_Enemy_Info.lightning_res);
+          enemy_resistances.wind_res = parseFloat(selected_Enemy_Info.wind_res);
+          enemy_resistances.nature_res = parseFloat(selected_Enemy_Info.nature_res);
+          enemy_resistances.holy_res = parseFloat(selected_Enemy_Info.holy_res);
+          enemy_resistances.dark_res = parseFloat(selected_Enemy_Info.dark_res);
+          enemy_reward_gold = parseInt(selected_Enemy_Info.enemy_reward_gold);
+          enemy_timing = parseInt(selected_Enemy_Info.enemy_timing);
+          timer = enemy_timing;
+          enemy_behavior = selected_Enemy_Info.enemy_behavior;
+          enemy_behavior_data = selected_Enemy_Behavior_data;
+          selected_Level = localStorage.getItem("selected_Level");
+          if(selected_Level == "Forest of Beginnings: Den of the Forest King"){
+            retreat_blocked = true;
+          }
+          document.getElementById("SelectedLevel_display").innerHTML = selected_Level;
+          localStorage.removeItem("selected_Enemy_Info");
+          localStorage.removeItem("selected_Enemy_Behavior_data");
+          localStorage.removeItem("selected_Level");
+          load_enemy_img();
+        }
+
+        function update_Enemy_Display()
+        {
+          document.getElementById("Enemy_Name_Display").innerHTML = enemy_name;
+          document.getElementById("Enemy_CurrentHP_Display").innerHTML = enemy_current_health;
+          document.getElementById("Enemy_MaxHP_Display").innerHTML = enemy_max_health;
+          document.getElementById("Fire_Res_Display").innerHTML = enemy_resistances.fire_res*100+"%";
+          document.getElementById("Water_Res_Display").innerHTML = enemy_resistances.water_res*100+"%";
+          document.getElementById("Frost_Res_Display").innerHTML = enemy_resistances.frost_res*100+"%";
+          document.getElementById("Earth_Res_Display").innerHTML = enemy_resistances.earth_res*100+"%";
+          document.getElementById("Lightning_Res_Display").innerHTML = enemy_resistances.lightning_res*100+"%";
+          document.getElementById("Wind_Res_Display").innerHTML = enemy_resistances.wind_res*100+"%";
+          document.getElementById("Nature_Res_Display").innerHTML = enemy_resistances.nature_res*100+"%";
+          document.getElementById("Holy_Res_Display").innerHTML = enemy_resistances.holy_res*100+"%";
+          document.getElementById("Dark_Res_Display").innerHTML = enemy_resistances.dark_res*100+"%";
+          document.getElementById("Attack_Timer_Display").innerHTML = timer;
+          if (enemy_current_health == 0){
+            document.getElementById("Enemy_PercentHP_Display").innerHTML = "(Defeated)";
+          }else{
+            document.getElementById("Enemy_PercentHP_Display").innerHTML = "("+((enemy_current_health/enemy_max_health)*100).toFixed(2)+"%)";
+          }
+        }
+
+        function update_Enemy_Healthbar(damage)
+        {
+        var total = enemy_max_health,
+            value = enemy_current_health;
+
+        var newValue = parseInt(value -  damage);
+        if(newValue <= 0){
+          newValue = 0;
+        }
+        else if(newValue > total){
+          newValue = total;
+        }
+
+        var barWidth = (newValue / total) * 100;
+        var hitWidth = (damage / value) * 100 + "%";
+
+        document.getElementById("Enemy_hit").style.width = hitWidth;
+
+        setTimeout(function(){
+          document.getElementById("Enemy_hit").style.width = 0;
+          document.getElementById("Enemy_bar").style.width = barWidth + "%";
+        }, 500);
+        }
+
+        function update_Player_Healthbar(damage)
+        {
+        var total = player_max_health,
+            value = player_current_health;
+
+        var newValue = value - damage;
+        if(newValue <= 0){
+          newValue = 0;
+        }
+        else if(newValue > total){
+          newValue = total;
+        }
+
+        var barWidth = (newValue / total) * 100;
+        var hitWidth = (damage / value) * 100 + "%";
+
+        document.getElementById("Player_hit").style.width = hitWidth;
+
+        setTimeout(function(){
+          document.getElementById("Player_hit").style.width = 0;
+          document.getElementById("Player_bar").style.width = barWidth + "%";
+        }, 500);
+        }
+
+        function randomize_Chant(wordType, wordNum)
+        {
+          var randomized_chant;
+          const arcane_array =
+          ["arcanus","impigri","incitatio","navitas","mysticus","magicae","impetus",
+          "Arcanus","Impigri","Incitatio","Navitas","Mysticus","Magicae","Impetus"];
+          const fire_array =
+          ["ignis","incendi","flamma","inflammo","flagro","exardes","ardere","combustum","exuris",
+          "Ignis","Incendi","Flamma","Inflammo","Flagro","Exardes","Ardere","Combustum","Exuris"];
+          const water_array =
+          ["aquae","amnis","fluvius","undae","inrigavi","adaqua","flumen","eluvio","torrentis","inundatio",
+          "Aquae","Amnis","Fluvius","Undae","Inrigavi","Adaqua","Flumen","Eluvio","Torrentis","Inundatio"];
+          const frost_array =
+          ["gelus","glacies","hiemal","brumae","frigidus","algoris","nivis","stiria",
+          "Gelus","Glacies","Hiemal","Brumae","Frigidus","Algoris","Nivis","Stiria"];
+          const earth_array =
+          ["saxum","scopulus","silex","lapidosus","lapis","gemma","calcis","terra","solum","gleba","sordes","lutum",
+          "Saxum","Scopulus","Silex","Lapidosus","Lapis","Gemma","Calcis","Terra","Solum","Gleba","Sordes","Lutum"];
+          const lightning_array =
+          ["fulgur","fulmen","electricitas","impuls","tonitrus","tempesti","attonitus",
+          "Fulgur","Fulmen","Electricitas","Impuls","Tonitrus","Tempesti","Attonitus"];
+          const wind_array =
+          ["ventus","aquilo","auster","eurus","favonius","torqueo","procell","turbinis","nimbus","anhelas",
+          "Ventus","Aquilo","Auster","Eurus","Favonius","Torqueo","Procell","Turbinis","Nimbus","Anhelas"];
+          const nature_array =
+          ["natura","herba","gramen","arbor","folium","floris","fructus","floresco","viridis","silva","palmes",
+          "Natura","Herba","Gramen","Arbor","Folium","Floris","Fructus","Floresco","Viridis","Silva","Palmes"];
+          const holy_array =
+          ["sanctus","pietas","deus","divinus","religio","augur","lucis","illustris","sanctus",
+          "Sanctus","Pietas","Deus","Divinus","Religio","Augur","Lucis","Illustris","Sanctus"];
+          const dark_array =
+          ["obscurus","fuscus","tenebris","caligo","nigellus","umbra","maleficus","improbus","pravus","scleratus",
+          "Obscurus","Fuscus","Tenebris","Caligo","Nigellus","Umbra","Maleficus","Improbus","Pravus","Scleratus"];
+          const healing_array =
+          ["sanesco","medeor","medicari","regenero","curatio","sanatio","salus","valetudo","valentia","vigoris",
+          "Sanesco","Medeor","Medicari","Regenero","Curatio","Sanatio","Salus","Valetudo","Valentia","Vigoris"];
+          const protection_array =
+          ["custodio","defendis","vindico","tueor","tutamen","praesidium","scutum","obex","armatura","loricatus",
+          "Custodio","Defendis","Vindico","Tueor","Tutamen","Praesidium","Scutum","Obex","Armatura","Loricatus"];
+          var word_array;
+
+          switch(wordType) {
+            case "arcane":
+              word_array = arcane_array;
+              break;
+            case "fire":
+              word_array = fire_array;
+              break;
+            case "water":
+              word_array = water_array;
+              break;
+            case "frost":
+              word_array = frost_array;
+              break;
+            case "earth":
+              word_array = earth_array;
+              break;
+            case "lightning":
+              word_array = lightning_array;
+              break;
+            case "wind":
+              word_array = wind_array;
+              break;
+            case "nature":
+              word_array = nature_array;
+              break;
+            case "holy":
+              word_array = holy_array;
+              break;
+            case "dark":
+              word_array = dark_array;
+              break;
+            case "healing":
+              word_array = healing_array;
+              break;
+            case "protection":
+              word_array = protection_array;
+              break;
+          }
+
+          randomized_chant = word_array[Math.floor(Math.random() * word_array.length)];
+          for (ii=1; ii< wordNum; ii++){
+            randomized_chant += " "+word_array[Math.floor(Math.random() * word_array.length)];
+          }
+
+          return randomized_chant;
+        }
+
+        function cast_Spell(chant_input)
+        {
+          var spell_in_tome = false;
+          for (i=0; i< spellName_array.length; i++){
+            if(chant_input == spellChant_array[i]){
+              spell_in_tome = true;
+              addToLog("You cast "+spellName_array[i]);
+              if (combat_state == true){
+                trigger_Effects(spellName_array[i]);
+              }
+              else{
+                alert("You are not in combat!");
+              }
+              var temp_chant = randomize_Chant(wordType_array[i],wordNum_array[i]);
+              for (j=0; j< spellChant_array.length;){
+                if(spellChant_array[j]==temp_chant){
+                  temp_chant = randomize_Chant(wordType_array[i],wordNum_array[i]);
+                }
+                else{
+                  j++;
+                }
+              }
+              spellChant_array[i]=temp_chant;
+            }
+          }
+          if(spell_in_tome==false){
+            addToLog("Invalid Input!");
+          }
+          update_Spelltome_ul();
+        }
+
+        function trigger_Effects(spell_Name)
+        {
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+          spell_effects.forEach(effect_spellname => {
+            if(spell_Name==effect_spellname.effect_spellname){
+              apply_Effect(effect_spellname.effect_type,effect_spellname.effect_value);
+            }
+          });
+        }
+
+        function trigger_Victory()
+        {
+          if (localStorage.getItem("myGold") == null) return;
+          var myGold = parseInt(localStorage.getItem("myGold"));
+          clearInterval(timerTock)
+          combat_state = false;
+          myGold += enemy_reward_gold;
+          localStorage.setItem("myGold", myGold);
+
+          if (localStorage.getItem("level_outerforest_completed") != "true" && selected_Level == "Forest of Beginnings: Outer Forest") {
+            localStorage.setItem("level_outerforest_completed", "true");
+          }
+          if (localStorage.getItem("level_innerforest_completed") != "true" && selected_Level == "Forest of Beginnings: Inner Forest") {
+            localStorage.setItem("level_innerforest_completed", "true");
+          }
+
+          document.getElementById("Attack_Timer_Display").innerHTML = "(Combat End)";
+          document.getElementById("Combat_Guide_txt").innerHTML="Type <span class=\"typeB\">Return</span> to go back to Main Hub.";
+          addToLog("You have defeated the enemy");
+          addToLog("You earned "+enemy_reward_gold+" G");
+        }
+
+        function trigger_Defeat()
+        {
+          clearInterval(timerTock)
+          combat_state = false;
+          document.getElementById("Attack_Timer_Display").innerHTML = "(Combat End)";
+          document.getElementById("Combat_Guide_txt").innerHTML="Type <span class=\"typeB\">Return</span> to go back to Main Hub.";
+          addToLog("You have been defeated");
+        }
+
+        function trigger_Enemy_Escape()
+        {
+          clearInterval(timerTock)
+          combat_state = false;
+          document.getElementById("Attack_Timer_Display").innerHTML = "(Combat End)";
+          document.getElementById("Combat_Guide_txt").innerHTML="Type <span class=\"typeB\">Return</span> to go back to Main Hub.";
+          addToLog(enemy_name+" has Escaped");
+        }
+
+        function apply_Effect(effectType,effectValue){
+          if(effectType=="damage_enemy_pure"){
+            damage_Enemy_Pure(effectValue);
+          }
+          else if(effectType=="damage_enemy_fire"){
+            damage_Enemy_Elemental("fire",effectValue,enemy_resistances.fire_res);
+          }
+          else if(effectType=="damage_enemy_water"){
+            damage_Enemy_Elemental("water",effectValue,enemy_resistances.water_res);
+          }
+          else if(effectType=="damage_enemy_frost"){
+            damage_Enemy_Elemental("frost",effectValue,enemy_resistances.frost_res);
+          }
+          else if(effectType=="damage_enemy_earth"){
+            damage_Enemy_Elemental("earth",effectValue,enemy_resistances.earth_res);
+          }
+          else if(effectType=="damage_enemy_lightning"){
+            damage_Enemy_Elemental("lightning",effectValue,enemy_resistances.lightning_res);
+          }
+          else if(effectType=="damage_enemy_wind"){
+            damage_Enemy_Elemental("wind",effectValue,enemy_resistances.wind_res);
+          }
+          else if(effectType=="damage_enemy_nature"){
+            damage_Enemy_Elemental("nature",effectValue,enemy_resistances.nature_res);
+          }
+          else if(effectType=="damage_enemy_holy"){
+            damage_Enemy_Elemental("holy",effectValue,enemy_resistances.holy_res);
+          }
+          else if(effectType=="damage_enemy_dark"){
+            damage_Enemy_Elemental("dark",effectValue,enemy_resistances.dark_res);
+          }
+          else if(effectType=="damage_player"){
+            damage_Player(effectValue);
+          }
+          else if(effectType=="heal_player"){
+            heal_Player(effectValue);
+          }
+          else if(effectType=="negate_slime_player"){
+            negate_Slime_Player(effectValue);
+          }
+
+        }
+
+        function heal_Player(effectValue){
+          addToLog("You healed "+effectValue+" HP");
+          player_current_health += parseInt(effectValue);
+          if(player_current_health >= player_max_health){
+            player_current_health = player_max_health;
+          }
+          update_Player_HP_Display();
+          update_Player_Healthbar(effectValue*-1);
+        }
+
+        function damage_Enemy_Elemental(elementText, effectValue, resistance){
+          var totalDamage = Math.trunc(effectValue - (effectValue*resistance));
+          update_Enemy_Healthbar(totalDamage);
+          enemy_current_health -= totalDamage;
+          addToLog(enemy_name+" received "+totalDamage+" "+elementText+" damage");
+          if (enemy_current_health<=0){
+            enemy_current_health=0;
+            trigger_Victory();
+          }
+          else if(enemy_current_health > enemy_max_health){
+            enemy_current_health = enemy_max_health;
+          }
+          update_Enemy_Display();
+        }
+
+        function damage_Enemy_Pure(effectValue){
+          update_Enemy_Healthbar(parseInt(effectValue));
+          enemy_current_health -= parseInt(effectValue);
+          addToLog(enemy_name+" received "+effectValue+" pure damage");
+          if (enemy_current_health<=0){
+            enemy_current_health=0;
+            trigger_Victory();
+          }
+          else if(enemy_current_health > enemy_max_health){
+            enemy_current_health = enemy_max_health;
+          }
+          update_Enemy_Display();
+        }
+
+        function damage_Player(effectValue){
+          addToLog("You received "+effectValue+" damage");
+          update_Player_Healthbar(effectValue)
+          player_current_health -= effectValue;
+          if (player_current_health<=0){
+            player_current_health=0;
+            trigger_Defeat();
+          }
+          else if(player_current_health > player_max_health){
+            player_current_health = player_max_health;
+          }
+          update_Player_HP_Display();
+        }
+
+        function start_Attack_Timer(duration)
+        {
+          timer = duration;
+          timerTock = setInterval(function () {
+            document.getElementById("Attack_Timer_Display").innerHTML = timer;
+
+            if (--timer < 0)
+            {
+                timer = duration;
+                trigger_Enemy_Behavior();
+            }
+          }, 1000);
+        }
+
+        function trigger_Enemy_Behavior(){
+          if(enemy_behavior=="basic"){
+            behavior_basic();
+          }
+          else if(enemy_behavior=="escaper"){
+            behavior_escaper();
+          }
+          else if(enemy_behavior=="forest_boss"){
+            behavior_forest_boss();
+          }
+        }
+
+        function behavior_basic(){
+          addToLog(enemy_name+" "+enemy_behavior_data.attack_desc);
+          damage_Player(enemy_behavior_data.attack_damage);
+        }
+
+        function behavior_escaper(){
+          if(enemy_behavior_data.escape_hp >= enemy_current_health){
+            if(enemy_behavior_data.escape_ready == true){
+              trigger_Enemy_Escape();
+            }
+            else{
+              addToLog(enemy_name+" is trying to escape!");
+              enemy_behavior_data.escape_ready = true;
+            }
+          }
+          else{
+            addToLog(enemy_name+" "+enemy_behavior_data.attack_desc);
+            damage_Player(enemy_behavior_data.attack_damage);
+          }
+        }
+
+        function behavior_forest_boss(){
+          var enemy_action = Math.floor(1+Math.random()*3)
+          if(enemy_action == 1){
+            addToLog(enemy_name+" "+enemy_behavior_data.attack_desc);
+            damage_Player(enemy_behavior_data.attack_damage);
+          }
+          else if(enemy_action == 2){
+            if(enemy_current_health <= enemy_max_health-enemy_behavior_data.self_heal){
+              addToLog(enemy_name+" absorbs the green slimes around it, healing "+enemy_behavior_data.self_heal+" HP");
+              addToLog(enemy_name+" is healed for "+enemy_behavior_data.self_heal+" HP");
+              enemy_current_health += parseInt(enemy_behavior_data.self_heal);
+              update_Enemy_Display();
+              update_Enemy_Healthbar(enemy_behavior_data.self_heal*-1);
+            }
+            else{
+              addToLog(enemy_name+" "+enemy_behavior_data.attack_desc);
+              damage_Player(enemy_behavior_data.attack_damage);
+            }
+          }
+          else if(enemy_action == 3){
+            addToLog(enemy_name+" commands green slimes to grab onto your body");
+            addToLog("You are unable to act for "+enemy_behavior_data.slimed_duration+" seconds");
+            document.getElementById("Textbox").disabled = true;
+            document.getElementById("Textbox").value = "YOU ARE SLIMED";
+            setTimeout(() => {
+              document.getElementById("Textbox").disabled = false;
+              document.getElementById("Textbox").value = "";
+              addToLog("You are now able to act");
+            }, enemy_behavior_data.slimed_duration*1000);
+          }
+        }
+      
+      function load_combat_node(){
+        var cn = document.getElementById("combatNode");
+        if(selected_Level=="Training Grounds"||selected_Level==null){
+          cn.classList.add("trainBG"); cn.classList.remove("forestBG");
+        }else{
+          cn.classList.add("forestBG"); cn.classList.remove("trainBG");
+        }
+      }
+
+      function load_enemy_img(){
+        var eimg = document.getElementById("enemyImg");
+        switch(enemy_name){
+          case 'Green Slime':
+          eimg.classList.add("slime");
+          break;
+          case 'Angry Rabbit':
+          eimg.classList.add("rabbit");
+          break;
+          case 'Giant Caterpillar':
+          eimg.classList.add("caterpillar");
+          break;
+          case 'Goblin Scout':
+          eimg.classList.add("goblin");
+          break;
+          case 'Forest Boar':
+          eimg.classList.add("boar");
+          break;
+          case 'Giant Moth':
+          eimg.classList.add("moth");
+          break;
+          case 'King Green Slime':
+          eimg.classList.add("slimeboss");
+          break;
+        }
+      }
+
+      window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>

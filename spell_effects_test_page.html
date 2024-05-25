@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <style>
+        .BlueBG{
+          display:flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh; width: auto;
+          background-color: rgb(186 230 253)
+        }
+        .app{
+          width: 64rem; height: auto;
+          border-radius: 1rem;
+          background-color: white;
+        }
+        .centerdiv{
+          display: flex; 
+          justify-content: center;
+        }
+      </style>
+</head>
+<body>
+    <div class="BlueBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Spell Effects Debug</h1>
+          </div>
+
+          <div class="centerdiv">
+            <form action="" id="Effect_form">
+            Spell Name:<br>
+            <select id="Spellname_txt"></select> <br>
+            Effect Type:<br>
+            <select id="Effect_type_txt" >
+              <option value="damage_enemy_pure">damage_enemy_pure</option>
+              <option value="damage_player">damage_player</option>
+              <option value="damage_enemy_fire">damage_enemy_fire</option>
+              <option value="damage_enemy_water">damage_enemy_water</option>
+              <option value="damage_enemy_frost">damage_enemy_frost</option>
+              <option value="damage_enemy_earth">damage_enemy_earth</option>
+              <option value="damage_enemy_lightning">damage_enemy_lightning</option>
+              <option value="damage_enemy_wind">damage_enemy_wind</option>
+              <option value="damage_enemy_nature">damage_enemy_nature</option>
+              <option value="damage_enemy_holy">damage_enemy_holy</option>
+              <option value="damage_enemy_dark">damage_enemy_dark</option>
+              <option value="heal_player">heal_player</option>
+              <option value="negate_slime_player">negate_slime_player</option>
+            </select><br>
+            Value:<br>
+            <input type="number" id="Value_num" value="1"><br>
+            <input type="submit" value="Add Spell Effect">
+          </form>
+          </div>
+
+          <p class="centerdiv">Existing Effects:</p>
+          <div class="centerdiv">
+            <ul style="list-style-type: none;">
+              <li>
+                <input type="text" value="index" size="3" readonly>
+                <select>
+                  <option value="" selected disabled hidden readonly>Spell Name</option>
+                </select>
+                <select >
+                  <option value="" selected disabled hidden readonly>effect_type</option>
+                </select>
+                <input type="text" value="Effect Value" readonly>
+                <input type="button" value="delete" class="fa fa-trash" readonly disabled>
+              </li>
+            </ul>
+          </div>
+          <div class="centerdiv">
+            <ul id="Effects_ul" style="list-style-type: none; width: auto; height: 200px; overflow: auto"></ul>
+          </div>
+
+        </div>
+    </div>
+      <script>
+        document.getElementById("Effect_form").addEventListener("submit", e => {
+        e.preventDefault();
+        add_Effect();
+        });
+
+        function start()
+        {
+          load_Spells();
+          load_Effects()
+        }
+
+        function load_Spells()
+        {
+          if (localStorage.getItem("spells") == null) return;
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          const spell_list = document.getElementById("Spellname_txt");
+          let option = new Option(spellname.spellname, spellname.spellname);
+          spell_list.add(option,undefined);
+          });
+        }
+
+        function load_Effects()
+        {
+          if (localStorage.getItem("spell_effects") == null) return;
+
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          const list = document.getElementById("Effects_ul");
+          list.innerHTML = "";
+
+          spell_effects.forEach((effect_spellname,index) => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+          <input type="text" value="${index}" size="3" readonly>
+          <select id="${effect_spellname.effect_spellname}_txt" onchange="edit_SpellName(this)">
+              <option value="${effect_spellname.effect_spellname}" selected disabled hidden>${effect_spellname.effect_spellname}</option>
+          </select>
+          <select onchange="edit_EffectType(this)">
+              <option value="${effect_spellname.effect_type}" selected disabled hidden>${effect_spellname.effect_type}</option>
+              <option value="damage_enemy_pure">damage_enemy_pure</option>
+              <option value="damage_player">damage_player</option>
+              <option value="damage_enemy_fire">damage_enemy_fire</option>
+              <option value="damage_enemy_water">damage_enemy_water</option>
+              <option value="damage_enemy_frost">damage_enemy_frost</option>
+              <option value="damage_enemy_earth">damage_enemy_earth</option>
+              <option value="damage_enemy_lightning">damage_enemy_lightning</option>
+              <option value="damage_enemy_wind">damage_enemy_wind</option>
+              <option value="damage_enemy_nature">damage_enemy_nature</option>
+              <option value="damage_enemy_holy">damage_enemy_holy</option>
+              <option value="damage_enemy_dark">damage_enemy_dark</option>
+              <option value="heal_player">heal_player</option>
+              <option value="negate_slime_player">negate_slime_player</option>
+          </select>
+          <input type="number" value="${effect_spellname.effect_value}" onblur="edit_EffectValue(this)">
+          <input type="button" value="delete" class="fa fa-trash" onclick="remove_Effect(this)">`;
+
+          list.insertBefore(li, list.children[0]);
+
+          spells.forEach(spellname => {
+          const spellname_list = document.getElementById(effect_spellname.effect_spellname+"_txt");
+          let option = new Option(spellname.spellname, spellname.spellname);
+          spellname_list.add(option,undefined);
+          });
+          });
+        }
+
+        function add_Effect()
+        {
+          const effect_spellname = document.getElementById("Spellname_txt").value;
+          const effect_type = document.getElementById("Effect_type_txt").value;
+          const effect_value = document.getElementById("Value_num").value;
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"), 
+          { effect_spellname: effect_spellname, effect_type: effect_type, effect_value: effect_value}]));
+        
+          load_Effects()
+        }
+
+        function remove_Effect(event) 
+        {
+        let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+
+        spell_effects.forEach((effect_spellname,index) => {
+            if (index == event.parentNode.children[0].value) {
+              spell_effects.splice(spell_effects.indexOf(effect_spellname), 1);
+            }
+        });
+        localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        load_Effects();
+        }
+
+        function edit_SpellName(event) 
+        {
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+          spell_effects.forEach((effect_spellname,index) => {
+            if (index == event.parentNode.children[0].value) {
+              effect_spellname.effect_spellname = event.value;
+            }
+          });
+
+          localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        }
+
+        function edit_EffectType(event) 
+        {
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+          spell_effects.forEach((effect_spellname,index) => {
+            if (index == event.parentNode.children[0].value) {
+              effect_spellname.effect_type = event.value;
+            }
+          });
+
+          localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        }
+
+        function edit_EffectValue(event) 
+        {
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+          spell_effects.forEach((effect_spellname,index) => {
+            if (index == event.parentNode.children[0].value) {
+              effect_spellname.effect_value = event.value;
+            }
+          });
+
+          localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        }
+
+        window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>

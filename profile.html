@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div class="profileBG">
+        <div class="app">
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1 id="NameAndHome_display">???'s Home</h1>
+          </div>
+
+          <div class="prtype">
+            <p>Type <span class="typeB">Return</span> to go back in town</p>
+            <p>Type <span class="typeB">Rename "Name"</span> to *magically* change your name</p>
+            <p>Type <span class="typeB">Inscribe "Spell Name"</span> to put a Spell in your Spell Tome</p>
+            <p>Type <span class="typeB">Erase "Spell Name"</span> to remove a Spell from your Spell Tome</p>
+          </div>
+
+          <div class="centerdiv prmid">
+            <input type="text" name="Textbox" id="Textbox" autofocus>
+            <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+          </div>
+
+          <div class="centerdiv" style="color: white;text-shadow: 1px 1px 5px green;">
+            <B style="padding-top: 2px;">Maximum Health:</B>
+            <div id="Enemy_HP_bar" class="health-bar">
+              <div id="Enemy_bar" class="bar">
+                  <div id="Enemy_hit" class="hit" style="padding: 0px 20px;">
+                  </label>&nbsp<label id="myMaxHP_display">???</label>&nbsp<label>HP</label>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="centerdiv" style="margin-top:20px;">
+            <label><B>Number of Spelltome pages:</B></label>&nbsp<label id="myPages_display">???</label>
+          </div>
+
+          <div class="centerdiv">
+            <p>Spells in Tome:</p>
+            <ul id="spelltome_ul" style="list-style-type: none;"></ul>
+          </div>
+
+          <div class="centerdiv">
+            <p>Learned Spells not in Tome:</p>
+            <ul id="learned_spells_ul" class="spellsBox"></ul>
+          </div>
+
+        </div>
+    </div>
+      <script>
+        var input = document.getElementById("Textbox");
+
+        input.addEventListener("keypress", function(event)
+        {
+          if (event.key === "Enter")
+          {
+            event.preventDefault();
+            document.getElementById("Enter_btn").click();
+          }
+        });
+
+        function start()
+        {
+          load_Spells();
+          load_Spelltome();
+          load_Pages();
+          load_MaxHP();
+          load_Name();
+        }
+
+        function enter_Chant()
+        {
+          var text_Box = document.getElementById("Textbox");
+          const chant_input = text_Box.value;
+          const chant_Array = chant_input.split(" ");
+
+          if(chant_input=="Return")
+          {
+            location.replace("main_hub.html");
+          }
+          else if(chant_Array[0]=="Inscribe")
+          {
+            inscribe_Spell(get_Input_Spellname(chant_Array))
+          }
+          else if(chant_Array[0]=="Erase")
+          {
+            erase_Spell(get_Input_Spellname(chant_Array))
+          }
+          else if(chant_Array[0]=="Rename")
+          {
+            setName(chant_Array)
+          }
+          else
+          {
+            alert("Invalid Input!");
+          }
+          text_Box.value = ""
+        }
+
+        function load_Spells()
+        {
+          if (localStorage.getItem("spells") == null) return;
+          document.getElementById("learned_spells_ul").innerHTML="";
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          const list = document.getElementById("learned_spells_ul");
+          const li = document.createElement("li");
+          li.innerHTML = `<input type="text" value="${spellname.spellname}" readonly>`;
+          if(spellname.isPurchased == "true" && spellname.inSpelltome == "false"){
+            list.insertBefore(li, list.children[0]);
+          }
+          });
+        }
+
+        function load_Spelltome()
+        {
+          if (localStorage.getItem("spells") == null) return;
+          document.getElementById("spelltome_ul").innerHTML="";
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          const list = document.getElementById("spelltome_ul");
+          const li = document.createElement("li");
+          li.innerHTML = `<input type="text" value="${spellname.spellname}" readonly>`;
+          if(spellname.inSpelltome == "true"){
+            list.insertBefore(li, list.children[0]);
+          }
+          });
+        }
+
+        function load_Pages()
+        {
+          if (localStorage.getItem("myPages") == null) return;
+          var myPages = localStorage.getItem("myPages");
+          var myPages_display = document.getElementById("myPages_display");
+          myPages_display.innerHTML = myPages;
+        }
+
+        function load_MaxHP()
+        {
+          if (localStorage.getItem("myMaxHP") == null) return;
+          var myMaxHP = localStorage.getItem("myMaxHP");
+          var myMaxHP_display = document.getElementById("myMaxHP_display");
+          myMaxHP_display.innerHTML = myMaxHP;
+        }
+
+        function load_Name()
+        {
+          if (localStorage.getItem("myName") == null) return;
+          var myName = localStorage.getItem("myName");
+          var myName_display = document.getElementById("NameAndHome_display");
+          myName_display.innerHTML = myName+"'s Home";
+        }
+
+        function get_Input_Spellname(chant_Array)
+        {
+          var spell_name=null;
+
+          if (chant_Array.length>=3){
+            spell_name = chant_Array[1];
+            for (i=2; i< chant_Array.length; i++){
+              spell_name += " "+chant_Array[i]
+            }
+          }
+          else if (chant_Array.length==2){
+            spell_name = chant_Array[1];
+          }
+
+          return spell_name;
+        }
+
+        function setName(chant_Array)
+        {
+          var myName = null;
+
+          if (chant_Array.length>=3){
+            myName = chant_Array[1];
+            for (i=2; i< chant_Array.length; i++){
+              myName += " "+chant_Array[i]
+            }
+          }
+          else if (chant_Array.length==2){
+            myName = chant_Array[1];
+          }
+          localStorage.setItem("myName", myName);
+          load_Name();
+        }
+
+        function inscribe_Spell(input_Spellname)
+        {
+          if (localStorage.getItem("spells") == null) return;
+          if (localStorage.getItem("myPages") == null) return;
+
+          var myPages = localStorage.getItem("myPages");
+          var inscribedSpells = 0;
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          var spell_exists=false;
+
+          spells.forEach(spellname => {
+            if(spellname.inSpelltome == "true"){
+              inscribedSpells += 1;
+            }
+          })
+
+          if(inscribedSpells>=myPages){
+            alert("Spell Tome is already full!");
+
+            return
+          }
+
+          spells.forEach(spellname => {
+            if(spellname.spellname == input_Spellname){
+              spell_exists=true;
+              if(spellname.isPurchased == "true"){
+                if(spellname.inSpelltome == "false"){
+                spellname.inSpelltome = "true";
+                localStorage.setItem("spells", JSON.stringify(spells));
+                }
+                else{
+                  alert("Spell is already inscribed!");
+                }
+              }
+              else{
+                alert("You haven't learned this spell!");
+              }
+            }
+          });
+          if(spell_exists==false){
+            alert("Invalid Spell!");
+          }
+          load_Spells();
+          load_Spelltome();
+        }
+
+        function erase_Spell(input_Spellname)
+        {
+          if (localStorage.getItem("spells") == null) return;
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          var spell_exists=false;
+
+          spells.forEach(spellname => {
+            if(spellname.spellname == input_Spellname){
+              spell_exists=true;
+              if(spellname.isPurchased == "true"){
+                if(spellname.inSpelltome == "true"){
+                spellname.inSpelltome = "false";
+                localStorage.setItem("spells", JSON.stringify(spells));
+                }
+                else{
+                  alert("Spell is not inscribed!");
+                }
+              }
+              else{
+                alert("You haven't learned this spell!");
+              }
+            }
+          });
+          if(spell_exists==false){
+            alert("Invalid Spell!");
+          }
+
+          load_Spells();
+          load_Spelltome();
+        }
+
+        window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+	<link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div class="introBG">
+        <div class="app">
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Spell Chant Typer Demo</h1>
+          </div>
+
+          <div class="centerdiv">
+            <p>Type words into the textbox and press enter or click the enter button to do actions.</p>
+          </div>
+
+          <div class="centerdiv">
+            <p>Type <span class="typeB">"Play"</span> to play the game</p>
+          </div>
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <input type="text" name="Textbox" id="Textbox" autofocus>
+            <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+          </div>
+
+        </div>
+    </div>
+      <script>
+        var input = document.getElementById("Textbox");
+
+        input.addEventListener("keypress", function(event)
+        {
+          if (event.key === "Enter")
+          {
+            event.preventDefault();
+            document.getElementById("Enter_btn").click();
+          }
+        });
+
+        function enter_Chant()
+        {
+          var text_Box = document.getElementById("Textbox");
+          var chant_input = text_Box.value;
+
+          if(chant_input=="Play")
+          {
+            intialize();
+            location.replace("main_hub.html");
+          }
+          else
+          {
+            alert("Invalid Input!");
+            text_Box.value = ""
+          }
+        }
+
+        function intialize(){
+          if (localStorage.getItem("isInitialized") != null && localStorage.getItem("isInitialized") == "true") return;
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Arcane Bolt", wordtype: "arcane", wordnum: 2 , price: 50 , isPurchased: "true", inSpelltome: "true"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Fire Bolt", wordtype: "fire", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Water Bolt", wordtype: "water", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Frost Bolt", wordtype: "frost", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Rock Bolt", wordtype: "earth", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Thunder Bolt", wordtype: "lightning", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Gale Bolt", wordtype: "wind", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Ivy Bolt", wordtype: "nature", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Minor Smite", wordtype: "holy", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Blood Bolt", wordtype: "dark", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"),
+          { spellname: "Minor Heal", wordtype: "healing", wordnum: 2 , price: 50 , isPurchased: "false", inSpelltome: "false"}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Arcane Bolt", effect_type: "damage_enemy_pure", effect_value: 5}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Fire Bolt", effect_type: "damage_enemy_fire", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Water Bolt", effect_type: "damage_enemy_water", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Frost Bolt", effect_type: "damage_enemy_frost", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Rock Bolt", effect_type: "damage_enemy_earth", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Thunder Bolt", effect_type: "damage_enemy_lightning", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Gale Bolt", effect_type: "damage_enemy_wind", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Ivy Bolt", effect_type: "damage_enemy_nature", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Minor Smite", effect_type: "damage_enemy_holy", effect_value: 10}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Blood Bolt", effect_type: "damage_enemy_dark", effect_value: 15}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Blood Bolt", effect_type: "damage_player", effect_value: 5}]));
+
+          localStorage.setItem("spell_effects", JSON.stringify([...JSON.parse(localStorage.getItem("spell_effects") || "[]"),
+          { effect_spellname: "Minor Heal", effect_type: "damage_enemy_fire", effect_value: 10}]));
+
+          localStorage.setItem("myGold", 0);
+          localStorage.setItem("myPages", 1);
+          localStorage.setItem("myMaxHP", 50);
+          localStorage.setItem("myName", "Wizard");
+
+          localStorage.setItem("isInitialized", "true");
+        }
+      </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <link rel="stylesheet" href="gui.css">
+</head>
+<body>
+    <div class="shopBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Rubick's Magic Shop</h1>
+          </div>
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <p>Type <span class="typeB">Return</span> to leave the shop</p>
+          </div>
+
+          <div class="centerdiv" style="padding-bottom: 15px;">
+            <label>Type <span class="typeB">Buy Life Fruit</span> to increase your Maximum Health, Price: 50 G</label>
+          </div>
+
+          <div class="centerdiv" style="padding-bottom: 15px;">
+            <label id="Buy_Page_txt">Type <span class="typeB">Buy Spelltome Page</span> to increase the number of Pages you have, Price:</label>&nbsp<label id="Buy_Page_Price_txt">??? G</label>
+          </div>
+
+          <div class="centerdiv" style="padding-bottom: 15px;">
+            <label>Type <span class="typeB">Buy "Spell Name"</span> to purchase a spell</label>
+          </div>
+
+          <div class="centerdiv shmid" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <input type="text" name="Textbox" id="Textbox" autofocus>
+            <input type="button" value="Enter" id="Enter_btn" onclick="enter_Chant()">
+          </div>
+
+          <div class="centerdiv">
+            Maximum Health: </label>&nbsp<label id="myMaxHP_display">???</label>&nbsp<label>HP</label>
+          </div>
+
+          <div class="centerdiv">
+            Spelltome Pages: </label>&nbsp<label id="myPages_display">???</label>
+          </div>
+
+          <div class="centerdiv">
+            <label>your gold:</label></label>&nbsp<label id="myGold_display">???</label>&nbsp<label>G</label>
+          </div>
+
+          <div class="centerdiv">
+            <ul id="Shop_guide_ul">
+              <input type="text" value="Spell Name" readonly>
+              <input type="text" value="Price" readonly>
+            </ul>
+          </div>
+
+          <div class="centerdiv" style="padding-bottom: 1rem;">
+            <ul id="Shop_ul" style="list-style-type: none; width: auto; height: 200px; overflow: auto"></ul>
+          </div>
+
+        </div>
+    </div>
+      <script>
+        var input = document.getElementById("Textbox");
+
+        function start()
+        {
+          load_Spells();
+          load_Gold();
+          load_Pages();
+          load_MaxHP();
+        }
+
+        input.addEventListener("keypress", function(event)
+        {
+          if (event.key === "Enter")
+          {
+            event.preventDefault();
+            document.getElementById("Enter_btn").click();
+          }
+        });
+
+        function enter_Chant()
+        {
+          var text_Box = document.getElementById("Textbox");
+          const chant_input = text_Box.value;
+          const chant_Array = chant_input.split(" ");
+
+          if(chant_input=="Return")
+          {
+            location.replace("main_hub.html");
+          }
+          else if (chant_input == "Buy Spelltome Page"){
+            buy_Page();
+          }
+          else if (chant_input == "Buy Life Fruit"){
+            buy_MaxHP();
+          }
+          else if(chant_Array[0]=="Buy")
+          {
+            buy_Spell(get_Input_Spellname(chant_Array))
+          }
+          else
+          {
+            alert("Invalid Input!");
+          }
+          text_Box.value = ""
+        }
+
+        function load_Spells()
+        {
+          if (localStorage.getItem("spells") == null) return;
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          const list = document.getElementById("Shop_ul");
+          const li = document.createElement("li");
+          li.innerHTML = `<input type="text" value="${spellname.spellname}" readonly>
+          <input type="text" value="${spellname.price} G" readonly>`;
+          if(spellname.isPurchased == "false"){
+            list.appendChild(li);
+          }
+          });
+        }
+
+        function load_Gold()
+        {
+          if (localStorage.getItem("myGold") == null) return;
+          var myGold = localStorage.getItem("myGold");
+          var myGold_display = document.getElementById("myGold_display");
+          myGold_display.innerHTML = myGold;
+        }
+
+        function get_Input_Spellname(chant_Array)
+        {
+          var spell_name=null;
+
+          if (chant_Array.length>=3){
+            spell_name = chant_Array[1];
+            for (i=2; i< chant_Array.length; i++){
+              spell_name += " "+chant_Array[i]
+            }
+          }
+          else if (chant_Array.length==2){
+            spell_name = chant_Array[1];
+          }
+
+          return spell_name;
+        }
+
+        function buy_Spell(input_Spellname)
+        {
+          if (localStorage.getItem("spells") == null) return;
+          if (localStorage.getItem("myGold") == null) return;
+
+          var myGold = parseInt(localStorage.getItem("myGold"));
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          var spell_exists=false;
+
+          spells.forEach(spellname => {
+            if(spellname.spellname == input_Spellname){
+              spell_exists=true;
+              if(spellname.isPurchased == "false"){
+                if(spellname.price <= myGold){
+                myGold = myGold-spellname.price;
+                spellname.isPurchased = "true";
+                localStorage.setItem("myGold", myGold);
+                localStorage.setItem("spells", JSON.stringify(spells));
+                alert("Purchased "+spellname.spellname);
+                document.getElementById("Shop_ul").innerHTML="";
+                load_Spells();
+                load_Gold();
+                }
+                else{
+                  alert("Not Enough Gold!");
+                }
+              }
+              else{
+                alert("Spell is already bought!");
+              }
+            }
+          });
+          if(spell_exists==false){
+            alert("Invalid Spell!");
+          }
+        }
+
+        function load_Pages()
+        {
+          if (localStorage.getItem("myPages") == null) return;
+          var myPages = parseInt(localStorage.getItem("myPages"));
+          var myPages_display = document.getElementById("myPages_display");
+          var page_price = document.getElementById("Buy_Page_Price_txt");
+          myPages_display.innerHTML = myPages;
+          page_price.innerHTML = myPages*50+" G";
+
+          if (myPages >= 5){
+            document.getElementById("Buy_Page_txt").innerHTML = "<span class=\"typeB\">Buy Spelltome Page</span> is unavailable, Price:";
+            page_price.innerHTML = "(Sold Out)";
+          }
+        }
+
+        function buy_Page()
+        {
+          if (localStorage.getItem("myPages") == null) return;
+          if (localStorage.getItem("myGold") == null) return;
+
+          var myGold = parseInt(localStorage.getItem("myGold"));
+          var myPages = parseInt(localStorage.getItem("myPages"));
+          if (myPages >= 5){
+            alert("You can only buy a maximum of 5 pages!(for now)");
+          }else{
+            if (myPages*50 <= myGold){
+              myGold -= myPages*50;
+              myPages += 1;
+              localStorage.setItem("myGold", myGold);
+              localStorage.setItem("myPages", myPages);
+              load_Pages();
+              load_Gold();
+            }
+            else{
+              alert("Not Enough Gold!");
+            }
+          }
+        }
+
+        function load_MaxHP()
+        {
+          if (localStorage.getItem("myMaxHP") == null) return;
+          var myMaxHP = localStorage.getItem("myMaxHP");
+          var myMaxHP_display = document.getElementById("myMaxHP_display");
+          myMaxHP_display.innerHTML = myMaxHP;
+        }
+
+        function buy_MaxHP()
+        {
+          if (localStorage.getItem("myMaxHP") == null) return;
+          if (localStorage.getItem("myGold") == null) return;
+
+          var myGold = parseInt(localStorage.getItem("myGold"));
+          var myMaxHP = parseInt(localStorage.getItem("myMaxHP"));
+
+            if (50 <= myGold){
+              myGold -= 50;
+              myMaxHP += 25;
+              localStorage.setItem("myGold", myGold);
+              localStorage.setItem("myMaxHP", myMaxHP);
+              load_MaxHP();
+              load_Gold();
+            }
+            else{
+              alert("Not Enough Gold!");
+            }
+        }
+
+        window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>

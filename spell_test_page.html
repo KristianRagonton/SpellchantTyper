@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spell Chant Typer</title>
+    <style>
+        .BlueBG{
+          display:flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh; width: auto;
+          background-color: rgb(186 230 253)
+        }
+        .app{
+          width: 64rem; height: auto;
+          border-radius: 1rem;
+          background-color: white;
+        }
+        .centerdiv{
+          display: flex; 
+          justify-content: center;
+        }
+      </style>
+</head>
+<body>
+    <div class="BlueBG">
+        <div class="app">
+
+          <div class="centerdiv" style="padding-top: 1rem; padding-bottom: 1rem;">
+            <h1>Spell Debug</h1>
+          </div>
+
+          <div class="centerdiv">
+            <form action="" id="Spell_form">
+            Spell Name:<br>
+            <input type="text" id="Spellname_txt" required> <br>
+            Words Type:<br>
+            <select id="Spellwordtype_txt" >
+              <option value="arcane">arcane</option>
+              <option value="fire">fire</option>
+              <option value="water">water</option>
+              <option value="frost">frost</option>
+              <option value="earth">earth</option>
+              <option value="lightning">lightning</option>
+              <option value="wind">wind</option>
+              <option value="nature">nature</option>
+              <option value="holy">holy</option>
+              <option value="dark">dark</option>
+              <option value="healing">healing</option>
+              <option value="protection">protection</option>
+            </select><br>
+            Number of Words:<br>
+            <input type="number" id="Spellwordnum_num" value="1" min="1" ><br>
+            Price in Shop: <br>
+            <input type="number" id="Spellprice_num" value="10" min="1" ><br>
+            <input type="submit" value="Add Spell">
+          </form>
+          </div>
+
+          <p class="centerdiv">Existing Spells:</p>
+          <div class="centerdiv">
+            <ul style="list-style-type: none;">
+              <li>
+                <input type="text" value="Spell Name" readonly>
+                <select readonly>
+                  <option value="WordType" selected disabled hidden>WordType</option>
+                </select>
+                <input type="text" value="Number of Words" readonly>
+                <input type="text" value="Shop Price" readonly>
+                <select readonly>
+                  <option value="WordType" selected disabled hidden>purchased</option>
+                </select>
+                <select readonly>
+                  <option value="WordType" selected disabled hidden>in tome</option>
+                </select>
+                <input type="button" value="delete" class="fa fa-trash" disabled>
+              </li>
+            </ul>
+          </div>
+          <div class="centerdiv">
+            <ul id="Spells_ul" style="list-style-type: none; width: auto; height: 200px; overflow: auto"></ul>
+          </div>
+
+        </div>
+    </div>
+      <script>
+        document.getElementById("Spell_form").addEventListener("submit", e => {
+        e.preventDefault();
+        add_Spell();
+        });
+
+        function start()
+        {
+          load_Spells();
+        }
+
+        function load_Spells()
+        {
+          if (localStorage.getItem("spells") == null) return;
+
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+
+          spells.forEach(spellname => {
+          const list = document.getElementById("Spells_ul");
+          const li = document.createElement("li");
+          li.innerHTML = `
+          <input type="text" value="${spellname.spellname}" onfocus="getCurrentSpellname(this)" onblur="editSpellname(this)">
+          <select onchange="editWordtype(this)">
+              <option value="${spellname.wordtype}" selected disabled hidden>${spellname.wordtype}</option>
+              <option value="arcane">arcane</option>
+              <option value="fire">fire</option>
+              <option value="water">water</option>
+              <option value="frost">frost</option>
+              <option value="earth">earth</option>
+              <option value="lightning">lightning</option>
+              <option value="wind">wind</option>
+              <option value="nature">nature</option>
+              <option value="holy">holy</option>
+              <option value="dark">dark</option>
+              <option value="healing">healing</option>
+              <option value="protection">protection</option>
+          </select>
+          <input type="number" value="${spellname.wordnum}" min="1" onblur="editWordnum(this)">
+          <input type="number" value="${spellname.price}" min="0" onblur="editPrice(this)">
+          <select onchange="togglePurchased(this)">
+              <option value="${spellname.isPurchased}" selected disabled hidden>${spellname.isPurchased}</option>
+              <option value="true">true</option>
+              <option value="false">false</option>
+              <option value="WordType" disabled hidden>purchased</option>
+          </select>
+          <select onchange="toggleSpelltome(this)">
+              <option value="${spellname.inSpelltome}" selected disabled hidden>${spellname.inSpelltome}</option>
+              <option value="true">true</option>
+              <option value="false">false</option>
+              <option value="WordType" disabled hidden>in tome</option>
+          </select>
+          <input type="button" value="delete" class="fa fa-trash" onclick="remove_Spell(this)">`;
+          list.insertBefore(li, list.children[0]);
+          });
+        }
+
+        function add_Spell()
+        {
+          var spells;
+          if (localStorage.getItem("spells") != null) {
+            spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          }
+          const spell_name = document.getElementById("Spellname_txt").value;
+          const wordtype = document.getElementById("Spellwordtype_txt").value;
+          const wordnum = document.getElementById("Spellwordnum_num").value;
+          const price = document.getElementById("Spellprice_num").value;
+          var is_repeated_spell = false;
+
+          if (localStorage.getItem("spells") != null) {
+            spells.forEach(spellname => {
+              if (spellname.spellname === spell_name) {
+                is_repeated_spell = true
+              }
+            });
+
+            if (is_repeated_spell == true){
+              alert("Spell already exists!");
+              return false;
+            }
+          }
+
+          localStorage.setItem("spells", JSON.stringify([...JSON.parse(localStorage.getItem("spells") || "[]"), 
+          { spellname: spell_name, wordtype: wordtype, wordnum: wordnum , price: price , isPurchased: "false", inSpelltome: "false"}]));
+        
+          const list = document.getElementById("Spells_ul");
+          list.innerHTML = "";
+          load_Spells();
+        }
+
+        function remove_Spell(event) 
+        {
+        let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+        let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+
+        spell_effects.forEach(effect_spellname => {
+            if (effect_spellname.effect_spellname == event.parentNode.children[0].value) {
+              spell_effects.splice(spell_effects.indexOf(effect_spellname), 1);
+            }
+        });
+
+        spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spells.splice(spells.indexOf(spellname), 1);
+            }
+        });
+        
+        localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        localStorage.setItem("spells", JSON.stringify(spells));
+        event.parentElement.remove();
+        }
+
+        var currentSpellname = null;
+        function getCurrentSpellname(event){
+          currentSpellname = event.value;
+        }
+
+        function editSpellname(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          let spell_effects = Array.from(JSON.parse(localStorage.getItem("spell_effects")));
+
+          if (event.value === "") {
+            alert("Spell name is empty!");
+            event.value = currentSpellname;
+            return;
+          }
+
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.value) {
+              alert("Spell name already exists!");
+              event.value = currentSpellname;
+              return;
+            }
+          });
+
+          spells.forEach(spellname => {
+            if (spellname.spellname === currentSpellname) {
+              spellname.spellname = event.value;
+            }
+          });
+
+          spell_effects.forEach(effect_spellname => {
+            if (effect_spellname.effect_spellname == currentSpellname) {
+              effect_spellname.effect_spellname = event.value;
+            }
+          });
+
+          localStorage.setItem("spells", JSON.stringify(spells));
+          localStorage.setItem("spell_effects", JSON.stringify(spell_effects));
+        }
+
+        function editWordtype(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spellname.wordtype = event.value;
+            }
+          });
+
+          localStorage.setItem("spells", JSON.stringify(spells));
+        }
+
+        function editWordnum(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spellname.wordnum = event.value;
+            }
+          });
+
+          localStorage.setItem("spells", JSON.stringify(spells));
+        }
+
+        function editPrice(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spellname.price = event.value;
+            }
+          });
+        
+          localStorage.setItem("spells", JSON.stringify(spells));
+        }
+
+        function togglePurchased(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spellname.isPurchased = event.value;
+            }
+          });
+
+          localStorage.setItem("spells", JSON.stringify(spells));
+        }
+
+        function toggleSpelltome(event) 
+        {
+          let spells = Array.from(JSON.parse(localStorage.getItem("spells")));
+          spells.forEach(spellname => {
+            if (spellname.spellname === event.parentNode.children[0].value) {
+              spellname.inSpelltome = event.value;
+            }
+          });
+
+          localStorage.setItem("spells", JSON.stringify(spells));
+        }
+        
+        window.addEventListener("load", start, false);
+      </script>
+</body>
+</html>
